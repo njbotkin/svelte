@@ -4,6 +4,8 @@ import { COMMENT_NODE } from '#client/constants';
 import {
 	HYDRATION_END,
 	HYDRATION_ERROR,
+	HYDRATION_SKIP_END,
+	HYDRATION_SKIP_START,
 	HYDRATION_START,
 	HYDRATION_START_ELSE
 } from '../../../constants.js';
@@ -95,6 +97,10 @@ export function skip_nodes(remove = true) {
 			if (data === HYDRATION_END) {
 				if (depth === 0) return node;
 				depth -= 1;
+			} else if (data === HYDRATION_SKIP_START) {
+				// Treat user-defined skip regions as opaque: their contents may include
+				// arbitrary comments (including `[` / `]`) that must not affect depth.
+				node = find_skip_end(node);
 			} else if (
 				data === HYDRATION_START ||
 				data === HYDRATION_START_ELSE ||
@@ -109,6 +115,35 @@ export function skip_nodes(remove = true) {
 		if (remove) node.remove();
 		node = next;
 	}
+}
+
+/**
+ * Given the `<!--[~-->` comment at the start of a hydration skip region, walk forward
+ * to the matching `<!--~]-->` comment (handling nested skip regions) and return it.
+ * @param {TemplateNode} start
+ * @returns {TemplateNode}
+ */
+export function find_skip_end(start) {
+	var depth = 1;
+	var node = /** @type {TemplateNode | null} */ (get_next_sibling(start));
+
+	while (node !== null) {
+		if (node.nodeType === COMMENT_NODE) {
+			var data = /** @type {Comment} */ (node).data;
+
+			if (data === HYDRATION_SKIP_START) {
+				depth += 1;
+			} else if (data === HYDRATION_SKIP_END) {
+				depth -= 1;
+				if (depth === 0) return node;
+			}
+		}
+
+		node = /** @type {TemplateNode | null} */ (get_next_sibling(node));
+	}
+
+	w.hydration_mismatch();
+	throw HYDRATION_ERROR;
 }
 
 /**

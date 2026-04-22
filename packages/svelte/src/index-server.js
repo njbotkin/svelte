@@ -54,3 +54,5 @@ export {
 export { hydratable } from './internal/server/hydratable.js';
 
 export { createRawSnippet } from './internal/server/blocks/snippet.js';
+
+export { skipHydration } from './internal/server/blocks/skip-hydration.js';

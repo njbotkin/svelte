@@ -25,6 +25,10 @@ export const HYDRATION_START = '[';
 export const HYDRATION_START_ELSE = '[!';
 /** used to indicate that a boundary's `failed` snippet was rendered on the server */
 export const HYDRATION_START_FAILED = '[?';
+/** used to indicate the start of a region that should be skipped by the hydration pass */
+export const HYDRATION_SKIP_START = '[~';
+/** used to indicate the end of a region that should be skipped by the hydration pass */
+export const HYDRATION_SKIP_END = '~]';
 export const HYDRATION_END = ']';
 export const HYDRATION_ERROR = {};
 
