@@ -100,7 +100,17 @@ export function skip_nodes(remove = true) {
 			} else if (data === HYDRATION_SKIP_START) {
 				// Treat user-defined skip regions as opaque: their contents may include
 				// arbitrary comments (including `[` / `]`) that must not affect depth.
-				node = find_skip_end(node);
+				var skip_end = find_skip_end(node);
+				if (remove) {
+					while (node !== skip_end) {
+						var after = /** @type {TemplateNode} */ (get_next_sibling(node));
+						node.remove();
+						node = after;
+					}
+					// `node` is now the skip-end comment; the outer loop will remove it too
+				} else {
+					node = skip_end;
+				}
 			} else if (
 				data === HYDRATION_START ||
 				data === HYDRATION_START_ELSE ||
