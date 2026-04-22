@@ -254,3 +254,4 @@ export { hydrate, mount, unmount } from './internal/client/render.js';
 export { tick, untrack, settled } from './internal/client/runtime.js';
 export { createRawSnippet } from './internal/client/dom/blocks/snippet.js';
 export { skipHydration } from './internal/client/dom/blocks/skip-hydration.js';
+export { lazyHydrate } from './internal/client/dom/blocks/lazy-hydration.js';
